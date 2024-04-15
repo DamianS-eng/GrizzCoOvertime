@@ -1,5 +1,7 @@
 const BOT_ID = '518861328526606347';
 const PAO_ID = '306566034448449537';
+const VERIFY_CHANNEL = '1224519734326857768';
+const LOG_CHANNEL = '1224912426701688833';
 const DM_ENABLED = ['score'];
 const Discord = require('discord.js');
 const client = new Discord.Client({
@@ -69,6 +71,16 @@ client.once('ready', async () => {
 
 // Parsing
 client.on('messageCreate', async message => {
+	if (message.channel.id == VERIFY_CHANNEL) { // User verification; anti-spam measure.
+		if (message.content.includes('gamer')) {
+			const member = message.guild.members.cache.get(message.author.id);
+			if (member) {
+				await member.roles.add(message.guild.roles.cache.find(role => role.name === 'gamer'));
+				await globals.client.channels.cache.get(LOG_CHANNEL).send(`Verified user <@${message.author.id}>.`);
+			}
+		}
+		return message.delete();
+	}
 	const args = message.content.slice(prefix.length).trim().split(/[\n\s]+/);
 	const commandName = args.shift().toLowerCase();
 	const command = client.commands.get(commandName);
